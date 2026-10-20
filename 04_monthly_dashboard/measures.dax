@@ -1,0 +1,87 @@
+// ===== 月次ダッシュボード見本（EC）のメジャー =====
+// テーブル：fact_sales（明細）, dim_customer（顧客）, Calendar（下の計算テーブル）
+// リレーション：fact_sales[CustomerID] → dim_customer[CustomerID]（多対1）
+//              fact_sales[OrderDate]  → Calendar[Date]（多対1）
+
+// --- 計算テーブル（モデリング → 新しいテーブル） ---
+Calendar =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2010, 12, 1 ), DATE ( 2011, 12, 31 ) ),
+    "年月", FORMAT ( [Date], "yyyy-mm" ),
+    "月初", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 )
+)
+// Calendar を「日付テーブルとしてマーク」→ 日付列 = Date
+
+// --- 計算テーブル：コホートの軸（経過月 0〜12） ---
+経過月 = GENERATESERIES ( 0, 12, 1 )
+
+// --- 計算列（fact_sales に作る）：その月が初回購入なら「新規」 ---
+顧客区分 =
+IF ( DATE ( YEAR ( fact_sales[OrderDate] ), MONTH ( fact_sales[OrderDate] ), 1 ) = RELATED ( dim_customer[FirstMonth] ),
+     "新規（その月が初回）", "既存（2回目以降）" )
+
+// --- メジャー（fact_sales に作る） ---
+売上 = SUM ( fact_sales[Amount] )
+
+注文数 = DISTINCTCOUNT ( fact_sales[InvoiceNo] )
+
+購入顧客数 = DISTINCTCOUNT ( fact_sales[CustomerID] )
+
+客単価 = DIVIDE ( [売上], [注文数] )
+
+新規顧客数 =
+VAR m = MAX ( Calendar[月初] )
+RETURN
+    CALCULATE ( DISTINCTCOUNT ( dim_customer[CustomerID] ),
+        FILTER ( ALL ( dim_customer[FirstMonth] ), dim_customer[FirstMonth] = m ),
+        ALL ( Calendar ) )
+
+売上 前月 = CALCULATE ( [売上], DATEADD ( Calendar[Date], -1, MONTH ) )
+売上 前月比 = DIVIDE ( [売上] - [売上 前月], [売上 前月] )
+
+注文数 前月比 = DIVIDE ( [注文数] - CALCULATE ( [注文数], DATEADD ( Calendar[Date], -1, MONTH ) ), CALCULATE ( [注文数], DATEADD ( Calendar[Date], -1, MONTH ) ) )
+購入顧客数 前月比 = DIVIDE ( [購入顧客数] - CALCULATE ( [購入顧客数], DATEADD ( Calendar[Date], -1, MONTH ) ), CALCULATE ( [購入顧客数], DATEADD ( Calendar[Date], -1, MONTH ) ) )
+客単価 前月比 = DIVIDE ( [客単価] - CALCULATE ( [客単価], DATEADD ( Calendar[Date], -1, MONTH ) ), CALCULATE ( [客単価], DATEADD ( Calendar[Date], -1, MONTH ) ) )
+
+// コホートの表：行 = dim_customer[FirstMonth]、列 = 経過月[Value]、値 = 継続率
+コホート 購入顧客数 =
+VAR k = SELECTEDVALUE ( '経過月'[Value] )
+VAR c = MAX ( dim_customer[FirstMonth] )
+VAR target = EDATE ( c, k )
+RETURN
+    CALCULATE ( DISTINCTCOUNT ( fact_sales[CustomerID] ),
+        FILTER ( ALL ( Calendar ), Calendar[月初] = target ) )
+
+コホート 継続率 =
+VAR base = CALCULATE ( [コホート 購入顧客数], '経過月'[Value] = 0 )
+RETURN IF ( NOT ISBLANK ( [コホート 購入顧客数] ), DIVIDE ( [コホート 購入顧客数], base ) )
+
+// ===== 2026-10-20 実際に Power BI で作ったときに変えた所 =====
+// Power Query（fact_sales）の最後に：ClosedMonths = Table.SelectRows(Typed, each [OrderDate] < #date(2011, 12, 1))
+
+// dim_customer の計算列（コホート表の行に使う。日付の階層にしないため）
+初回月 = FORMAT ( dim_customer[FirstMonth], "yyyy-mm" )
+
+// コホート（上の定義を置き換え）
+コホート 購入顧客数 =
+VAR k = SELECTEDVALUE ( '経過月'[Value] )
+VAR c = MAX ( dim_customer[FirstMonth] )
+VAR target = EDATE ( c, k )
+RETURN IF ( target < DATE ( 2011, 12, 1 ),
+    CALCULATE ( DISTINCTCOUNT ( fact_sales[CustomerID] ), FILTER ( ALL ( Calendar ), Calendar[月初] = target ) ) )
+
+コホート 継続率 =
+VAR base = CALCULATE ( [コホート 購入顧客数], '経過月'[Value] = 0 )
+RETURN IF ( ISINSCOPE ( dim_customer[初回月] ) && ISINSCOPE ( '経過月'[Value] ), DIVIDE ( [コホート 購入顧客数], base ) )
+
+// 前月比はカードに文字で出す
+売上 前月比 =
+VAR p = CALCULATE ( [売上], DATEADD ( Calendar[Date], -1, MONTH ) )
+RETURN "前月比 " & FORMAT ( DIVIDE ( [売上] - p, p ), "+0.0%;-0.0%" )
+// 注文数・購入顧客数・客単価 の前月比も同じ形
+
+// カード表示用（自動の表示単位で 3K と丸められるのを避ける）
+売上高 = FORMAT ( [売上], "£#,0" )
+注文件数 = FORMAT ( [注文数], "#,0" ) & " 件"
+購入客数 = FORMAT ( [購入顧客数], "#,0" ) & " 人"
+客単価（1注文） = FORMAT ( [客単価], "£#,0" )
