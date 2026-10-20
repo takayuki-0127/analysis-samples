@@ -14,6 +14,27 @@ SNS・EC・アンケートの3分野で、「問い → 仮説 → 検証 → �
 | [03_survey](03_survey) | アンケート：満足を左右する項目はどれか（市民アンケート・143人） | 6項目を同時に見ると「情報の得やすさ」だけがはっきり残る（オッズ比 1.94） | クロス集計・カイ二乗検定・ロジスティック回帰 | [1枚レポート PDF](03_survey/out/survey_1page.pdf) |
 | [04_monthly_dashboard](04_monthly_dashboard) | 月次：毎月の数字をどう見せるか（02 と同じ EC データ） | KPI 4つと前月比、新規／既存の月次売上、初回購入月別の継続率を1ページに | Power BI（DAX・Power Query・条件付き書式） | [画面](04_monthly_dashboard/out/pbi_dashboard.png)・[.pbix](04_monthly_dashboard/ec_monthly_dashboard.pbix) |
 
+## English summary (3 lines each)
+**01 SNS / video – what makes a trending video stay trending** (YouTube Trending, Japan, 11,808 videos)
+- Goal: find which early signals are associated with a video staying on the trending list.
+- Method: logistic regression with average marginal effects and bootstrap intervals.
+- Finding / proposal: videos that enter trending on their publish day stay longer (+14.0 pt); focus effort on day-0 momentum (promote within hours of publishing) and test a consistent title format with alternating releases.
+
+**02 EC – which customer segment to act on** (UCI Online Retail, 4,338 customers)
+- Goal: decide which customers to target with what action.
+- Method: RFM segmentation and monthly cohort retention.
+- Proposal: win back the 283 "at-risk loyal" customers (loyal customers are 26% of customers but 66% of revenue) with a randomised 8-week test, and prompt a second purchase within 30 days of the first.
+
+**03 Survey – which item drives satisfaction** (UCI Somerville Happiness Survey, 143 respondents)
+- Goal: identify the items most associated with overall satisfaction and the groups to prioritise.
+- Method: cross-tabulation, chi-square tests and logistic regression on all six items together.
+- Proposal: improve "availability of information" first (the only item that remains clear, odds ratio 1.94), and confirm it in the next survey.
+
+**04 Monthly dashboard – how to report the numbers every month** (same data as 02)
+- Goal: show the monthly KPIs a client checks every month on one page.
+- Method: Power BI (DAX, Power Query, conditional formatting) with four KPIs, month-over-month change, new vs. returning revenue and cohort retention.
+- Proposal: use it as the monthly deliverable, with a short comment on the next month's numbers.
+
 ## データとライセンス
 - 01：Kaggle「Trending YouTube Video Statistics」（datasnaek/youtube-new）日本分・CC0。元データは同梱していない
 - 02：UCI Machine Learning Repository「Online Retail」・CC BY 4.0（https://archive.ics.uci.edu/dataset/352/online+retail）。元データは同梱していない
