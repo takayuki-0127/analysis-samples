@@ -23,6 +23,9 @@ SNS・EC・アンケートの3分野で、「問い → 仮説 → 検証 → �
 - 人数・期間・データの偏りなどの限界を、レポートの中に必ず書く
 
 ## 使っている道具
-Python（pandas・statsmodels・scipy・matplotlib）。共通の色・フォント・日本語の折り返しは `analysis_kit.py`
+Python（pandas・statsmodels・scipy・matplotlib。02 は Excel を読むので openpyxl も）。共通の色・フォント・日本語の折り返しは `analysis_kit.py`
+
+## 動かし方
+`pip install pandas numpy scipy statsmodels matplotlib openpyxl` のあと、各フォルダに入って `python proposal_report.py`（01）・`python ec_report.py`（02）・`python survey_report.py`（03）。結果は各フォルダの `out/` に出る。日本語フォント（Noto Sans CJK・游ゴシック・メイリオのどれか）がない環境では、図の日本語が出ない
 
 作成：2026-10-20　松浦 孝征（https://github.com/takayuki-0127）
