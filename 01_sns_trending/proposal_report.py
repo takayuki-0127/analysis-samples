@@ -2,7 +2,7 @@
 import os, numpy as np, pandas as pd, statsmodels.formula.api as smf, matplotlib.pyplot as plt
 from analysis_kit import NAVY, TEAL, ORANGE, INK, MUTED, _wrap   # 分析テンプレートの色・フォント・折り返しを使う
 from prep import load
-OUT = "out_proposal"; os.makedirs(OUT, exist_ok=True)
+OUT = "out"; os.makedirs(OUT, exist_ok=True)
 v = load()
 FM = 'stay ~ like_pct + com_pct + bracket + num + q + ex + tlen + night + cd + lv0 + lag + C(cat, Treatment("エンタメ"))'
 m = smf.logit(FM, data=v).fit(disp=0, cov_type="HC3")

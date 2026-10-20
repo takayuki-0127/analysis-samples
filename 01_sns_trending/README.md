@@ -8,12 +8,13 @@
 ## データ
 - Kaggle「Trending YouTube Video Statistics」（datasnaek/youtube-new）の日本分。CC0（再配布・商用利用とも可）
 - 2018-02〜06 に急上昇に載った動画のうち、2018年以降に公開・公開から7日以内に急上昇入り・評価が有効の 11,808 本
-- 元データ（約29MB）はこのリポジトリに入れていない。Kaggle（https://www.kaggle.com/datasets/datasnaek/youtube-new）から `JPvideos.csv` と `JP_category_id.json` を落とし、`prep.py` の `D` をその場所に変えると再現できる
+- 元データ（約29MB）はこのリポジトリに入れていない。Kaggle（https://www.kaggle.com/datasets/datasnaek/youtube-new）から `JPvideos.csv` と `JP_category_id.json` を落とし、置いた場所を環境変数 `JP_DATA` で指定して（または `prep.py` の `D` を書きかえて）、このフォルダで `python proposal_report.py` を実行すると再現できる
+- ブートストラップは数分かかる。2回目からは `out/effects.csv` を読むので、計算し直すときはこのファイルを消す
 
 ## 問いと結果
 - 問い：急上昇に載った動画のうち、翌日以降も載り続ける（伸びが続く）動画は何が違うか（全体の42%が2日以上残った）
 - 仮説1「初日のいいね率が高いほど残る」→ **支持されず**（条件をそろえると 5% と 1% の差 −1.3pt、95%CI −3.3〜+0.4）
-- 仮説2「タイトルの型で残りやすさが違う」→ **支持**（【】 +3.2pt、！ +3.5pt、20字は40字より +4.5pt）
+- 仮説2「タイトルの型で残りやすさが違う」→ **支持**（【】 +3.2pt、！ +3.6pt、20字は40字より +4.5pt）
 - ほかに：公開当日に急上昇に入った動画は翌日入りより +14.0pt（初速）
 
 ## 次の打ち手
