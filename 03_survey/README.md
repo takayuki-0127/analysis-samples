@@ -23,5 +23,5 @@
 2. 学校・道路・イベントは項目どうしの重なりが大きいので、次回の調査で分けて確かめる（設問の追加・地区ごとの比較）
 
 ## ファイル
-- `survey_report.py`：分析と1枚レポートのスクリプト（`SURVEY_CSV` でデータの場所を変えられる）
+- `survey_report.py`：分析と1枚レポートのスクリプト（このフォルダで `python survey_report.py`。`SURVEY_CSV` でデータの場所を変えられる）
 - `out/survey_1page.pdf`・`.png`、`fig1_crosstab.png`・`fig2_logit.png`、`crosstab_chi2.csv`・`logit_or.csv`・`item_corr.csv`
